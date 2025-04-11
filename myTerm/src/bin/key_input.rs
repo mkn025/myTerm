@@ -1,46 +1,39 @@
+use crossterm::{terminal, event::{self, Event, KeyCode}};
+use std::time::Duration;
 
-use k_board::{keyboard::Keyboard, keys::Keys};
-use std::process::Command; 
-fn get_key_input() {
-    println!("Listening for keys. Press Down to clear, Enter to exit...");
-    // Keyboard::new() creates an iterator that yields key presses.
-    for key in Keyboard::new() {
-        match key {
-            // Case for the Down arrow key
-            Keys::Down => {
-                println!("Down arrow pressed - clearing screen.");
-                let status = Command::new("clear")
-                                  .status(); // Get the exit status
+fn main() -> Result<(), std::io::Error> {
+    println!("Press Esc to exit...");
+    // Enable raw mode
+    terminal::enable_raw_mode()?;
 
-                // Handle potential errors when running the command
-                match status {
-                    Ok(exit_status) => {
-                        if !exit_status.success() {
-                            eprintln!("Failed to clear screen: command exited with status {}", exit_status);
-                        }
+    loop {
+        // Poll for an event for a short duration
+        if event::poll(Duration::from_millis(100))? {
+            // Read the event
+            match event::read()? {
+                Event::Key(key_event) => {
+                    println!("Key: {:?}", key_event); // Prints detailed key info
+                    if key_event.code == KeyCode::Esc {
+                        break; // Exit on Escape
                     }
-                    Err(e) => {
-                        eprintln!("Failed to execute clear command: {}", e);
-                        // Consider alternatives or just log if 'clear' isn't critical
-                    }
+                    // You can check key_event.code for specific KeyCodes (like Char('a'), Enter, Up, etc.)
+                    // and key_event.modifiers for Ctrl/Alt/Shift
+                }
+                Event::Resize(width, height) => {
+                     println!("Resized to {}x{}", width, height);
+                     // Handle resize if needed
+                }
+                _ => {
+                     // Handle other events like mouse if enabled
                 }
             }
-            // Case for the Enter key
-            Keys::Enter => {
-                println!("Enter pressed - exiting loop.");
-                // Break out of the for loop
-                break;
-            }
-            // Default case for any other key
-            _ => {
-                println!("Detected key: {:?}", key);
-            }
+        } else {
+            // No event occurred within the timeout
+            // You could do other work here if needed
         }
     }
-    println!("Exited key input loop.");
-}
 
-// Main function runs 
-fn main() {
-    get_key_input();
+    // Always disable raw mode before exiting
+    terminal::disable_raw_mode()?;
+    Ok(())
 }
