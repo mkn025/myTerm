@@ -3,6 +3,8 @@ use winit::event::WindowEvent;
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 
+mod key_input;
+
 #[derive(Default)]
 struct App {
     window: Option<Window>,
@@ -19,6 +21,20 @@ impl ApplicationHandler for App {
                 println!("The close button was pressed; stopping");
                 event_loop.exit();
             },
+
+            WindowEvent::KeyboardInput { event, .. } => {
+                if let Some(text) = key_input::get_text_from_key_event(&event) {
+                    println!("Inputted text: {}", text);
+                    // Process the input text
+                 }
+                // You might also want to handle key presses/releases for actions here
+                // based on event.physical_key or event.logical_key
+             }
+                
+
+
+
+
             WindowEvent::RedrawRequested => {
                 // Redraw the application.
                 //
