@@ -8,6 +8,5 @@ edition = "2021"
 default-run = "myTerm"
 
 [dependencies]
-winit = "*"
-
+speedy2d = "1.0"
 
