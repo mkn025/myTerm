@@ -3,6 +3,13 @@ name = "myTerm"
 version = "0.1.0"
 edition = "2021"
 
+# default-run 
+# Runs myTerm when not specified
+default-run = "myTerm"
+
 [dependencies]
 glfw = "0.59.0"
 crossterm = { version = "0.27", features = ["event-stream"] }
+winit = "0.30.9"
+
+

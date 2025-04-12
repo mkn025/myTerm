@@ -1,39 +1,48 @@
-use crossterm::{terminal, event::{self, Event, KeyCode}};
+use crossterm::{terminal, event::{self, Event, KeyCode, KeyEventKind}};
 use std::time::Duration;
+use std::io::Write; // Import the Write trait for flush()
 
 fn main() -> Result<(), std::io::Error> {
-    println!("Press Esc to exit...");
-    // Enable raw mode
+    println!("Press Esc to exit..."); // This initial println is fine before raw mode
     terminal::enable_raw_mode()?;
 
     loop {
-        // Poll for an event for a short duration
         if event::poll(Duration::from_millis(100))? {
-            // Read the event
             match event::read()? {
-                Event::Key(key_event) => {
-                    println!("Key: {:?}", key_event); // Prints detailed key info
-                    if key_event.code == KeyCode::Esc {
-                        break; // Exit on Escape
+                Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
+                    match key_event.code {
+                        KeyCode::Char(c) => {
+                            // Use print! with \r\n and flush
+                            print!("Char: {}\r\n", c);
+                            std::io::stdout().flush()?; // Ensure it's written immediately
+                        }
+                        KeyCode::Esc => {
+                            // Also ensure exit message is flushed and uses \r\n
+                            print!("Exiting...\r\n");
+                            std::io::stdout().flush()?;
+                            break;
+                        }
+                        KeyCode::Enter => {
+                            print!("Enter pressed\r\n");
+                            std::io::stdout().flush()?;
+                        }
+                        _ => {
+                            // Ignored for now
+                        }
                     }
-                    // You can check key_event.code for specific KeyCodes (like Char('a'), Enter, Up, etc.)
-                    // and key_event.modifiers for Ctrl/Alt/Shift
                 }
                 Event::Resize(width, height) => {
-                     println!("Resized to {}x{}", width, height);
-                     // Handle resize if needed
+                    // Handle resize if needed, ensure flushing
+                    print!("Resized to {}x{}\r\n", width, height);
+                    std::io::stdout().flush()?;
                 }
-                _ => {
-                     // Handle other events like mouse if enabled
-                }
+                _ => {} // Ignore other event types
             }
         } else {
-            // No event occurred within the timeout
-            // You could do other work here if needed
+            // Timeout elapsed
         }
     }
 
-    // Always disable raw mode before exiting
     terminal::disable_raw_mode()?;
     Ok(())
 }
