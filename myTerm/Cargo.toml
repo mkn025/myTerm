@@ -9,4 +9,4 @@ default-run = "myTerm"
 
 [dependencies]
 speedy2d = "1.0"
-
+nix = { version = "0.29", default-features = false, features = ["term", "process", "fs"] }
