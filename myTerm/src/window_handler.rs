@@ -33,5 +33,6 @@ impl WindowHandler for MyWindowHandler {
 
     fn on_keyboard_char(&mut self, _helper: &mut WindowHelper, unicode_codepoint: char) {
         self.input.push(unicode_codepoint);
+        
     }
 }
