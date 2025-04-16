@@ -3,7 +3,7 @@ use window_handler::MyWindowHandler;
 mod window_handler;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> { // Or appropriate error type
-    let window = Window::new_centered("myTerm", (800, 800)).unwrap();
+    let window = Window::new_centered("myTerm", (1400, 1100)).unwrap();
 
     match MyWindowHandler::new() {
         Ok(handler) => {
